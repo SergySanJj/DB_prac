@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 FILE *TicketsFL;
 FILE *UsersFL;
@@ -77,6 +78,20 @@ void setTicket(struct Ticket *ticket, __int32 ticketID, __int32 price, __int32 s
 }
 
 
+int userCount() {
+    fseek(UsersIND, 0, SEEK_END);
+    long usersCount = ftell(UsersIND) / sizeof(struct UserIndex);
+    rewind(UsersIND);
+    return usersCount;
+}
+
+int ticketCount() {
+    fseek(TicketsFL, 0, SEEK_END);
+    long ticketCount = ftell(TicketsFL) / sizeof(struct Ticket);
+    rewind(TicketsFL);
+    return ticketCount;
+}
+
 long get_userIndexPosition(char *email) {
     struct UserIndex userIndex;
     fseek(UsersIND, 0, SEEK_END);
@@ -136,6 +151,36 @@ void get_m(struct User *user, char email[]) {
     fread(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
     fseek(UsersFL, userIndex.index, SEEK_SET);
     fread(user, 1, sizeof(struct User), UsersFL);
+}
+
+void get_s(struct Ticket *ticket, char email[], __int32 ticketID) {
+    struct User user;
+    get_m(&user, email);
+    if (strcmp(user.email, email) != 0) {
+        printf("User with %s doesn't exist\n", email);
+        return;
+    }
+    if (!ticketExists(ticketID)) {
+        printf("Ticket with %i doesn't exist\n", ticketID);
+        return;
+    }
+
+    ticket->ticketID = -1;
+    fseek(TicketsFL, 0, SEEK_SET);
+    while (ticket->ticketID != user.firstOwnedTicketID) {
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+
+    while (ticket->ticketID != ticketID || ticket->nextTicketPosition != -1) {
+        fseek(TicketsFL, ticket->nextTicketPosition, SEEK_SET);
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+    if (ticket->ticketID == ticketID) {
+        return;
+    } else {
+        printf("No such ticket %i found for %s", ticketID, email);
+        setTicket(ticket, -1, -1, -1);
+    }
 }
 
 void insert_m(struct User *user) {
@@ -232,8 +277,11 @@ void update_s(char email[], struct Ticket *updatedTicket) {
         printf("Ticket with id %i not found\n", updatedTicket->ticketID);
         return;
     }
+    struct UserIndex userIndex;
+    fseek(UsersIND, userIndPos, SEEK_SET);
+    fread(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
     struct User user;
-    fseek(UsersFL, userIndPos, SEEK_SET);
+    fseek(UsersFL, userIndex.index, SEEK_SET);
     fread(&user, sizeof(struct User), 1, UsersFL);
 
     struct Ticket ticket;
@@ -297,20 +345,26 @@ void show_all() {
     }
 }
 
-void callCommand(char *command, char *arg) {
-    printf("Calling %s with %s\n", command, arg);
-
-}
-
 
 int workCycle() {
     char command[10] = "";
-    char arg[32];
+
+    char email[256];
+    char phoneNumber[18];
+    char registrationDate[11];
+
+    __int32 ticketID;
+    __int32 price;
+    __int32 sitNumber;
+
+    char buff[8][64];
+
+
     printf("To end program use [end] command\n");
 
     while (true) {
         printf("Enter command "
-               "[get-m, get-s, del-m, del-s, update-m, update-s, insert-m, insert-s, count-m, count-s, show-all]\n");
+               "[get-m, get-s, del-m, del-s, update-m, update-s, insert-m, insert-s, count, show-all]\n");
         scanf("%s", command);
         if (strcmp(command, "end") == 0) {
             printf("Ending work with DB..\n");
@@ -320,26 +374,81 @@ int workCycle() {
         }
         printf("Enter argument for [%s]\n", command);
         if (strcmp(command, "get-m") == 0) {
-            
+            printf("email\n");
+            scanf("%s", email);
+            struct User user;
+            get_m(&user, email);
+
+            printf("%s %s %s\n", user.email, user.phoneNumber, user.registrationDate);
+            if (user.firstOwnedTicketID != -1)
+                show_sublist(user.firstOwnedTicketID);
         }
-        scanf("%s", arg);
-        callCommand(command, arg);
+
+        if (strcmp(command, "get-s") == 0) {
+            printf("email ticketID\n");
+            scanf("%s %s", email, buff[0]);
+            ticketID = strtol(buff[0], NULL, 10);
+
+            struct Ticket ticket;
+            get_s(&ticket, email, ticketID);
+            if (ticket.ticketID != -1) {
+                printf("%i %i %i\n", ticket.ticketID, ticket.price, ticket.sitNumber);
+            }
+        }
+
+        if (strcmp(command, "update-m") == 0) {
+            printf("email new: phoneNumber registrationDate\n");
+            scanf("%s %s %s", email, phoneNumber, registrationDate);
+            struct User user;
+            setUser(&user, email, phoneNumber, registrationDate);
+
+            update_m(&user);
+        }
+
+        if (strcmp(command, "update-s") == 0) {
+            printf("email ticketID new: price sitNumber\n");
+            scanf("%s %s %s %s", email, buff[0], buff[1], buff[2]);
+            struct Ticket ticket;
+            ticketID = strtol(buff[0], NULL, 10);
+            price = strtol(buff[1], NULL, 10);
+            sitNumber = strtol(buff[2], NULL, 10);
+            setTicket(&ticket, ticketID, price, sitNumber);
+
+            update_s(email, &ticket);
+        }
+
+        if (strcmp(command, "insert-m") == 0) {
+            printf("email phoneNumber registrationDate\n");
+            scanf("%s %s %s", email, phoneNumber, registrationDate);
+            struct User user;
+            setUser(&user, email, phoneNumber, registrationDate);
+
+            insert_m(&user);
+        }
+
+        if (strcmp(command, "insert-s") == 0) {
+            printf("email ticketID price sitNumber\n");
+            scanf("%s %s %s %s", email, buff[0], buff[1], buff[2]);
+            struct Ticket ticket;
+            ticketID = strtol(buff[0], NULL, 10);
+            price = strtol(buff[1], NULL, 10);
+            sitNumber = strtol(buff[2], NULL, 10);
+            setTicket(&ticket, ticketID, price, sitNumber);
+
+            insert_s(email, &ticket);
+        }
+
+        if (strcmp(command, "count") == 0) {
+            printf("User count: %i\nTickets count %i\n", userCount(), ticketCount());
+        }
+
+        if (strcmp(command, "show-all") == 0) {
+            show_all();
+        }
     }
 }
 
 int main() {
     startDB();
-    struct User user;
-    struct Ticket ticket;
-    setUser(&user, "test@gmail.com", "+3803928322", "12/12/2019");
-    setTicket(&ticket, 1113, 100, 1);
-    insert_m(&user);
-    insert_s("test@gmail.com", &ticket);
-    setTicket(&ticket, 1113, 200, 1);
-    update_s("test@gmail.com", &ticket);
-    strcpy(user.phoneNumber, "+38011223344");
-    update_m(&user);
-
-    show_all();
-    //workCycle();
+    workCycle();
 }
