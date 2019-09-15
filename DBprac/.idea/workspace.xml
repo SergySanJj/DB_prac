@@ -12,6 +12,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e67757cf-53fd-4215-a6b8-1b5f5510a8ad" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/dbcommands.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/globals.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/miscfunctions.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/workcycle.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -27,13 +32,55 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6929">
-              <caret line="86" column="31" lean-forward="true" selection-start-line="86" selection-start-column="31" selection-end-line="86" selection-end-column="31" />
+            <state relative-caret-position="170">
+              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/workcycle.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-947">
+              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+              <folding>
+                <element signature="e#95#115#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dbcommands.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="10" selection-start-line="10" selection-end-line="14" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/miscfunctions.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" selection-start-line="8" selection-end-line="12" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/globals.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+              <folding>
+                <element signature="e#92#110#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -58,7 +105,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/globals.h" />
+        <option value="$PROJECT_DIR$/miscfunctions.h" />
+        <option value="$PROJECT_DIR$/dbcommands.h" />
         <option value="$PROJECT_DIR$/main.c" />
+        <option value="$PROJECT_DIR$/workcycle.h" />
       </list>
     </option>
   </component>
@@ -133,23 +184,22 @@
       <workItem from="1567449621753" duration="1225000" />
       <workItem from="1567708705443" duration="599000" />
       <workItem from="1568458824079" duration="15789000" />
-      <workItem from="1568535565171" duration="23744000" />
+      <workItem from="1568535565171" duration="24206000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41728000" />
+    <option name="totallyTimeSpent" value="42190000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26066098" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.29252437" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.29252437" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.25893825" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -170,20 +220,6 @@
     <option name="version" value="1" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.c</url>
-          <line>318</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.c</url>
-          <line>358</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
         <watch expression="ftell(UsersIND)" language="ObjectiveC" />
@@ -213,12 +249,46 @@
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/tickets.fl">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/globals.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding>
+            <element signature="e#92#110#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/miscfunctions.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" selection-start-line="8" selection-end-line="12" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dbcommands.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="14" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6929">
-          <caret line="86" column="31" lean-forward="true" selection-start-line="86" selection-start-column="31" selection-end-line="86" selection-end-column="31" />
+        <state relative-caret-position="170">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/workcycle.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-947">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="e#95#115#0" expanded="true" />
           </folding>
         </state>
       </provider>
