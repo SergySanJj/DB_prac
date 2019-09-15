@@ -82,14 +82,32 @@ int userCount() {
     fseek(UsersIND, 0, SEEK_END);
     long usersCount = ftell(UsersIND) / sizeof(struct UserIndex);
     rewind(UsersIND);
-    return usersCount;
+
+    int result = 0;
+    struct UserIndex userIndex;
+    for (int i = 0; i < usersCount; i++) {
+        fread(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
+        if (userIndex.exists)
+            result++;
+    }
+
+    return result;
 }
 
 int ticketCount() {
     fseek(TicketsFL, 0, SEEK_END);
     long ticketCount = ftell(TicketsFL) / sizeof(struct Ticket);
     rewind(TicketsFL);
-    return ticketCount;
+
+    int result = 0;
+    struct Ticket ticket;
+    for (int i = 0; i < ticketCount; i++) {
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+        if (ticket.exists)
+            result++;
+    }
+
+    return result;
 }
 
 long get_userIndexPosition(char *email) {
@@ -117,25 +135,18 @@ bool ticketExists(__int32 ticketID) {
 
     for (int i = 0; i < ticketsCount; i++) {
         fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
-        if (ticket.ticketID == ticketID)
+        if (ticket.ticketID == ticketID && ticket.exists)
             return true;
     }
     return false;
 }
 
 bool userExists(char email[]) {
-    fseek(UsersIND, 0, SEEK_END);
-    long usersCount = ftell(UsersIND) / sizeof(struct UserIndex);
-    rewind(UsersIND);
-
-    struct UserIndex userIndex;
-
-    for (int i = 0; i < usersCount; i++) {
-        fread(&userIndex, sizeof(struct Ticket), 1, TicketsFL);
-        if (strcmp(userIndex.email, email) == 0)
-            return true;
+    long userIndPos = get_userIndexPosition(email);
+    if (userIndPos == -1) {
+        return false;
     }
-    return false;
+    return true;
 }
 
 void get_m(struct User *user, char email[]) {
@@ -304,6 +315,82 @@ void update_s(char email[], struct Ticket *updatedTicket) {
     }
 }
 
+void del_m(char email[]) {
+    if (!userExists(email)) {
+        printf("User with email %s not found\n", email);
+        return;
+    }
+    struct UserIndex userIndex;
+    struct User user;
+    long userIndPos = get_userIndexPosition(email);
+    fseek(UsersIND, userIndPos, SEEK_SET);
+    fread(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
+    fseek(UsersIND, -sizeof(struct UserIndex), SEEK_CUR);
+    userIndex.exists = false;
+    fwrite(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
+
+    fseek(UsersFL, userIndex.index, SEEK_SET);
+    fread(&user, sizeof(struct User), 1, UsersFL);
+
+    if (user.firstOwnedTicketID == -1)
+        return;
+
+    struct Ticket ticket;
+    ticket.ticketID = -1;
+    fseek(TicketsFL, 0, SEEK_SET);
+    while (ticket.ticketID != user.firstOwnedTicketID) {
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+
+    ticket.exists = false;
+    fseek(TicketsFL, -sizeof(struct Ticket), SEEK_CUR);
+    fwrite(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+
+    while (ticket.nextTicketPosition != -1) {
+        fseek(TicketsFL, ticket.nextTicketPosition, SEEK_SET);
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+        ticket.exists = false;
+        fseek(TicketsFL, -sizeof(struct Ticket), SEEK_CUR);
+        fwrite(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+}
+
+void del_s(char email[], __int32 ticketID) {
+    if (!userExists(email)) {
+        printf("User with email %s not found\n", email);
+        return;
+    }
+    struct UserIndex userIndex;
+    struct User user;
+    long userIndPos = get_userIndexPosition(email);
+    fseek(UsersIND, userIndPos, SEEK_SET);
+    fread(&userIndex, sizeof(struct UserIndex), 1, UsersIND);
+
+    fseek(UsersFL, userIndex.index, SEEK_SET);
+    fread(&user, sizeof(struct User), 1, UsersFL);
+
+    if (user.firstOwnedTicketID == -1)
+        return;
+
+    struct Ticket ticket;
+    ticket.ticketID = -1;
+    fseek(TicketsFL, 0, SEEK_SET);
+    while (ticket.ticketID != user.firstOwnedTicketID) {
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+
+
+    while (ticket.ticketID != ticketID && ticket.nextTicketPosition != -1) {
+        fseek(TicketsFL, ticket.nextTicketPosition, SEEK_SET);
+        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+    if (ticket.ticketID == ticketID) {
+        ticket.exists = false;
+        fseek(TicketsFL, -sizeof(struct Ticket), SEEK_CUR);
+        fwrite(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+    }
+}
+
 void show_sublist(__int32 firstOwnedTicketID) {
     if (firstOwnedTicketID < 0)
         return;
@@ -436,6 +523,19 @@ int workCycle() {
             setTicket(&ticket, ticketID, price, sitNumber);
 
             insert_s(email, &ticket);
+        }
+
+        if (strcmp(command, "del-m") == 0) {
+            printf("Email\n");
+            scanf("%s", email);
+            del_m(email);
+        }
+
+        if (strcmp(command, "del-s") == 0) {
+            printf("Email ticketID\n");
+            scanf("%s %s", email, buff[0]);
+            ticketID = strtol(buff[0], NULL, 10);
+            del_s(email, ticketID);
         }
 
         if (strcmp(command, "count") == 0) {
