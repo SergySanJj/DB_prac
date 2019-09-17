@@ -45,7 +45,7 @@ void get_s(struct Ticket *ticket, char email[], __int32 ticketID) {
     ticket->ticketID = -1;
     fseek(TicketsFL, 0, SEEK_SET);
     while (ticket->ticketID != user.firstOwnedTicketID) {
-        fread(&ticket, sizeof(struct Ticket), 1, TicketsFL);
+        fread(ticket, sizeof(struct Ticket), 1, TicketsFL);
     }
 
     while (ticket->ticketID != ticketID || ticket->nextTicketPosition != -1) {
